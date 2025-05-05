@@ -1,0 +1,10 @@
+pyproject.toml
+setup.py
+MyIsaac/__init__.py
+MyIsaac/ui_extension_example.py
+MyIsaac.egg-info/PKG-INFO
+MyIsaac.egg-info/SOURCES.txt
+MyIsaac.egg-info/dependency_links.txt
+MyIsaac.egg-info/not-zip-safe
+MyIsaac.egg-info/requires.txt
+MyIsaac.egg-info/top_level.txt
