@@ -9,6 +9,7 @@
       "C:/IsaacLab/source/isaaclab_assets",
       
     ],
+    
   
     // 가상환경 명확화(선택)
     "python.defaultInterpreterPath": "C:/Users/USER/miniconda3/envs/env_isaaclab/python.exe",
