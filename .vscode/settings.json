@@ -1,16 +1,16 @@
 {
     "python.analysis.extraPaths": [
       // isaaclab 본체
-      "C:/IsaacLab/source/isaaclab",         
+      "D:/IsaacLab/source/isaaclab",         
       // 개별 서브패키지를 제공하는 배포물 루트
-      "C:/IsaacLab/source/isaaclab_tasks",
-      "C:/IsaacLab/source/isaaclab_rl",
-      "C:/IsaacLab/source/isaaclab_mimic",
-      "C:/IsaacLab/source/isaaclab_assets",
+      "D:/IsaacLab/source/isaaclab_tasks",
+      "D:/IsaacLab/source/isaaclab_rl",
+      "D:/IsaacLab/source/isaaclab_mimic",
+      "D:/IsaacLab/source/isaaclab_assets",
       
     ],
     
   
     // 가상환경 명확화(선택)
-    "python.defaultInterpreterPath": "C:/Users/USER/miniconda3/envs/env_isaaclab/python.exe",
+    "python.defaultInterpreterPath": "D:/miniconda3/envs/env_isaaclab/python.exe",
   }
