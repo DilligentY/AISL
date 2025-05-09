@@ -15,7 +15,7 @@ models:
     network:
       - name: net
         input: STATES
-        layers: [64, 64]
+        layers: [256, 256]
         activations: elu
     output: ACTIONS
   value:  # see deterministic_model parameters
@@ -24,7 +24,7 @@ models:
     network:
       - name: net
         input: STATES
-        layers: [64, 64]
+        layers: [256, 256]
         activations: elu
     output: ONE
 
@@ -40,8 +40,8 @@ memory:
 # https://skrl.readthedocs.io/en/latest/api/agents/ppo.html
 agent:
   class: PPO
-  rollouts: 24
-  learning_epochs: 5
+  rollouts: 128
+  learning_epochs: 6
   mini_batches: 4
   discount_factor: 0.99
   lambda: 0.95
