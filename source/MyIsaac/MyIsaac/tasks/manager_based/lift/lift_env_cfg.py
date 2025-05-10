@@ -82,6 +82,10 @@ class CommandsCfg:
         ),
     )
 
+    # cube_pose = mdp.UniformCubePoseCommandCfg
+
+    
+
 
 @configclass
 class ActionsCfg:
@@ -219,7 +223,7 @@ class MyLiftEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self):
         """Post initialization."""
         # general settings
-        self.decimation = 5
+        self.decimation = 5 
         self.episode_length_s = 5.0
         # simulation settings
         self.sim.dt = 1/50.0  # 50Hz
