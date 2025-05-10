@@ -155,7 +155,7 @@ class RewardsCfg:
         func = mdp.object_goal_orientation,
         params={"command_name" : "object_pose", 
                 "minimal_height": 0.04, 
-                "robot_cfg" : SceneEntityCfg("robot", body_names="Robot"),
+                "robot_cfg" : SceneEntityCfg("robot"),
                 "object_cfg" : SceneEntityCfg("object", body_names="Object")},
         weight = 5.0,
     )
