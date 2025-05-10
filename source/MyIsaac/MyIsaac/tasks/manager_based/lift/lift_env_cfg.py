@@ -156,7 +156,7 @@ class RewardsCfg:
         params={"command_name" : "object_pose", 
                 "minimal_height": 0.04, 
                 "robot_cfg" : SceneEntityCfg("robot"),
-                "object_cfg" : SceneEntityCfg("object", body_names="Object")},
+                "object_cfg" : SceneEntityCfg("object", body_names="Object", body_ids=[0])},
         weight = 5.0,
     )
 
