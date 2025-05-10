@@ -153,7 +153,10 @@ class RewardsCfg:
 
     object_goal_tracking_rotation = RewTerm(
         func = mdp.object_goal_orientation,
-        params={"command_name" : "object_pose", "minimal_height": 0.04, "robot_cfg" : SceneEntityCfg("robot"), "object_cfg" : SceneEntityCfg("object")},
+        params={"command_name" : "object_pose", 
+                "minimal_height": 0.04, 
+                "robot_cfg" : SceneEntityCfg("robot", body_names=MISSING),
+                "object_cfg" : SceneEntityCfg("object", body_names=MISSING)},
         weight = 5.0,
     )
 
@@ -174,7 +177,8 @@ class TerminationsCfg:
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
 
     object_dropping = DoneTerm(
-        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("object")}
+        func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, 
+                                                    "asset_cfg": SceneEntityCfg("object", body_names=MISSING)}
     )
 
 

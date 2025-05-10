@@ -13,7 +13,7 @@ from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 
 from isaaclab_tasks.manager_based.manipulation.lift import mdp
 # from isaaclab_tasks.manager_based.manipulation.lift.lift_env_cfg import MyLiftEnvCfg
-from tasks.manager_based.lift.lift_env_cfg import MyLiftEnvCfg
+from MyIsaac.tasks.manager_based.lift.lift_env_cfg import MyLiftEnvCfg
 
 ##
 # Pre-defined configs
