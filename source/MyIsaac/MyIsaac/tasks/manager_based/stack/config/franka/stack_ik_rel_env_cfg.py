@@ -16,7 +16,7 @@ from isaaclab_assets.robots.franka import FRANKA_PANDA_HIGH_PD_CFG  # isort: ski
 
 
 @configclass
-class FrankaCubeStackEnvCfg(stack_joint_pos_env_cfg.FrankaCubeStackEnvCfg):
+class MyFrankaCubeStackEnvCfg(stack_joint_pos_env_cfg.MyFrankaCubeStackEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()

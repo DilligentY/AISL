@@ -160,7 +160,7 @@ class TerminationsCfg:
 
 
 @configclass
-class StackEnvCfg(ManagerBasedRLEnvCfg):
+class MyStackEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the stacking environment."""
 
     # Scene settings

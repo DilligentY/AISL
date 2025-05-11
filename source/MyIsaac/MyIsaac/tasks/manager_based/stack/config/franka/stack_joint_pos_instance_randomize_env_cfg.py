@@ -16,11 +16,9 @@ from isaaclab.sim.spawners.from_files.from_files_cfg import UsdFileCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 
-from isaaclab_tasks.manager_based.manipulation.stack import mdp
-from isaaclab_tasks.manager_based.manipulation.stack.mdp import franka_stack_events
-from isaaclab_tasks.manager_based.manipulation.stack.stack_instance_randomize_env_cfg import (
-    StackInstanceRandomizeEnvCfg,
-)
+from MyIsaac.tasks.manager_based.stack import mdp
+from MyIsaac.tasks.manager_based.stack.mdp import franka_stack_events
+from MyIsaac.tasks.manager_based.stack.stack_instance_randomize_env_cfg import MyStackInstanceRandomizeEnvCfg
 
 ##
 # Pre-defined configs
@@ -64,7 +62,7 @@ class EventCfg:
 
 
 @configclass
-class FrankaCubeStackInstanceRandomizeEnvCfg(StackInstanceRandomizeEnvCfg):
+class MyFrankaCubeStackInstanceRandomizeEnvCfg(MyStackInstanceRandomizeEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()

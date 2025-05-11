@@ -209,7 +209,7 @@ class ObservationsCfg:
 
 
 @configclass
-class FrankaCubeStackBlueprintEnvCfg(stack_joint_pos_env_cfg.FrankaCubeStackEnvCfg):
+class MyFrankaCubeStackBlueprintEnvCfg(stack_joint_pos_env_cfg.MyFrankaCubeStackEnvCfg):
     observations: ObservationsCfg = ObservationsCfg()
 
     def __post_init__(self):

@@ -79,7 +79,8 @@ def define_markers() -> VisualizationMarkers:
             "mesh_recolored": sim_utils.UsdFileCfg(
                 usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
                 scale=(10.0, 10.0, 10.0),
-                visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.25, 0.0)),
+                visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(1.0, 0.25, 0.0),
+                                                            opacity=0.5),
             ),
             "robot_mesh": sim_utils.UsdFileCfg(
                 usd_path=f"{ISAACLAB_NUCLEUS_DIR}/Robots/ANYbotics/ANYmal-C/anymal_c.usd",

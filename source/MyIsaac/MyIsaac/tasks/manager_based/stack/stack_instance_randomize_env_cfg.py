@@ -124,7 +124,7 @@ class TerminationsCfg:
 
 
 @configclass
-class StackInstanceRandomizeEnvCfg(ManagerBasedRLEnvCfg):
+class MyStackInstanceRandomizeEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the stacking environment."""
 
     # Scene settings
