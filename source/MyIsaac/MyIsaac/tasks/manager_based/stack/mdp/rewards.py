@@ -79,15 +79,19 @@ def object_goal_distance(
     env: ManagerBasedRLEnv,
     std: float,
     minimal_height: float,
+    stack_enum: int, 
     command_name: str,
     robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
     object_cfg: SceneEntityCfg = SceneEntityCfg("cube_1"),
+    height_threshold: float = 0.005,
+    height_diff: float = 0.0468,
 ) -> torch.Tensor:
     """Reward the agent for tracking the goal pose using tanh-kernel."""
     # extract the used quantities (to enable type-hinting)
     robot: RigidObject = env.scene[robot_cfg.name]
     object: RigidObject = env.scene[object_cfg.name]
     command = env.command_manager.get_command(command_name)
+    command[:, 2] += stack_enum * (height_threshold + height_diff)
     # compute the desired position in the world frame
     des_pos_b = command[:, :3]
     des_pos_w, _ = combine_frame_transforms(robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], des_pos_b)
@@ -106,7 +110,7 @@ def object_stack(
     
     robot: RigidObject = env.scene[robot_cfg.name]
     object: RigidObject = env.scene[object_cfg.name]
-    
+
 
 
 def object_goal_orientation(
