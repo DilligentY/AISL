@@ -324,3 +324,11 @@ def object_stacked(
     )
 
     return stacked
+
+
+def object_command(env: ManagerBasedRLEnv, command_name: str)-> torch.Tensor:
+    
+    cube_goal_pos = env.command_manager.get_command(command_name)
+    cube_goal_pos = torch.hstack((cube_goal_pos[:, 0:2], cube_goal_pos[:, 3:]))
+
+    return cube_goal_pos

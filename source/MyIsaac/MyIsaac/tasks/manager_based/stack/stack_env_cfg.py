@@ -6,12 +6,15 @@
 from dataclasses import MISSING
 
 import isaaclab.sim as sim_utils
-from isaaclab.assets import ArticulationCfg, AssetBaseCfg
+from isaaclab.assets import ArticulationCfg, AssetBaseCfg, RigidObjectCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
+from isaaclab.managers import CommandTermCfg as CommandsTerm
+from isaaclab.managers import RewardTermCfg as RewTerm
+from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import FrameTransformerCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import GroundPlaneCfg, UsdFileCfg
@@ -56,10 +59,29 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
         spawn=sim_utils.DomeLightCfg(color=(0.75, 0.75, 0.75), intensity=3000.0),
     )
 
+    cube_1 : RigidObjectCfg = MISSING
+    cube_2 : RigidObjectCfg = MISSING
+    cube_3 : RigidObjectCfg = MISSING
+
 
 ##
 # MDP settings
 ##
+
+@configclass
+class CommandsCfg:
+
+    stack_cube_pose= mdp.UniformCubePoseCommandCfg(
+        asset_name="cube_1",
+        body_name=MISSING,  # will be set by agent env cfg
+        resampling_time_range=(30.0, 30.0),
+        debug_vis=True,
+        ranges=mdp.UniformCubePoseCommandCfg.Ranges(
+            pos_x=(0.4, 0.6), pos_y=(-0.25, 0.25), pos_z=(0.0, 0.0), roll=(0.0, 0.0), pitch=(0.0, 0.0), yaw=(0.0, 0.0)
+        ),
+    )
+
+
 @configclass
 class ActionsCfg:
     """Action specifications for the MDP."""
@@ -83,6 +105,7 @@ class ObservationsCfg:
         object = ObsTerm(func=mdp.object_obs)
         cube_positions = ObsTerm(func=mdp.cube_positions_in_world_frame)
         cube_orientations = ObsTerm(func=mdp.cube_orientations_in_world_frame)
+        cube_command = ObsTerm(func=mdp.object_command, params={"command_name" : "stack_cube_pose"})
         eef_pos = ObsTerm(func=mdp.ee_frame_pos)
         eef_quat = ObsTerm(func=mdp.ee_frame_quat)
         gripper_pos = ObsTerm(func=mdp.gripper_pos)
@@ -128,6 +151,15 @@ class ObservationsCfg:
             },
         )
 
+        stack_2 = ObsTerm(
+            func=mdp.object_stacked,
+            params={
+                "robot_cfg": SceneEntityCfg("robot"),
+                "upper_object_cfg": SceneEntityCfg("cube_3"),
+                "lower_object_cfg": SceneEntityCfg("cube_2"),
+            },
+        )
+
         def __post_init__(self):
             self.enable_corruption = False
             self.concatenate_terms = False
@@ -136,6 +168,9 @@ class ObservationsCfg:
     policy: PolicyCfg = PolicyCfg()
     rgb_camera: RGBCameraPolicyCfg = RGBCameraPolicyCfg()
     subtask_terms: SubtaskCfg = SubtaskCfg()
+
+
+
 
 
 @configclass
@@ -157,6 +192,33 @@ class TerminationsCfg:
     )
 
     success = DoneTerm(func=mdp.cubes_stacked)
+
+class RewardCfg:
+    
+    cube_2_reach = RewTerm(func=mdp.object_ee_distance,
+                           params={"object_cfg": SceneEntityCfg("cube_2"), "std": 0.1}, weight=2.0)
+
+    cube_2_lift = RewTerm(func=mdp.object_is_lifted,
+                          params={"object_cfg": SceneEntityCfg("cube_2"),
+                                  "minimal_height": 0.04}, weight=15.0)
+    
+    cube_2_goal_reach = RewTerm(func=mdp.object_goal_distance,
+                                params={"object_cfg": SceneEntityCfg("cube_2"), 
+                                        "std": 0.3,
+                                        "minimum_height": 0.04})
+ 
+
+    cube_3_reach = RewTerm(func=mdp.object_ee_distance,
+                           params={"object_cfg": SceneEntityCfg("cube_3"), "std": 0.1}, weight=2.0)
+
+    cube_3_lift = RewTerm(func=mdp.object_is_lifted,
+                          params={"object_cfg": SceneEntityCfg("cube_3"),
+                                  "minimal_height": 0.04}, weight=15.0)
+    
+
+
+
+
 
 
 @configclass
