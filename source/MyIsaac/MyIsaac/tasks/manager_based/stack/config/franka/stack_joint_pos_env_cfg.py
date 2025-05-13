@@ -45,7 +45,9 @@ class EventCfg:
         params={
             "pose_range": {"x": (0.4, 0.6), "y": (-0.10, 0.10), "z": (0.0203, 0.0203), "yaw": (-1.0, 1, 0)},
             "min_separation": 0.1,
-            "asset_cfgs": [SceneEntityCfg("cube_1"), SceneEntityCfg("cube_2"), SceneEntityCfg("cube_3")],
+            "asset_cfgs": [SceneEntityCfg("cube_1"), 
+                           SceneEntityCfg("cube_2"), 
+                           SceneEntityCfg("cube_3")],
         },
     )
 
