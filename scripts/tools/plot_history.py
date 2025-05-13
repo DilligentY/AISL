@@ -9,6 +9,10 @@ import glob
 parser = argparse.ArgumentParser(description="Visualization Reward History")
 parser.add_argument("--library", type=str, default="skrl", help="Library for Reinforcement Learning")
 parser.add_argument("--task", type=str, default="franka_lift", help="Name of the task.")
+parser.add_argument("start_env", type=int, default=0, help="Start environment index for plotting")
+parser.add_argument("num_envs", type=int, default=2, help="Number of environments for plotting")
+parser.add_argument("max_step", type=int, default=4800, help="Max steps for plotting")
+parser.add_argument("plot_mode", type=str, default="mean", help="Plot mode: mean or merge")
 
 args_cli, hydra_args = parser.parse_known_args()
 
@@ -17,7 +21,8 @@ run_dirs = [d for d in glob.glob(os.path.join(logdir, '*')) if os.path.isdir(d)]
 
 all_data = {}
 
-for run_dir in run_dirs:
+for i in range(args_cli.start_env, args_cli.num_envs+1):
+    run_dir = run_dirs[i]
     run_name = os.path.basename(run_dir)  # 예) run1, run2 등 폴더명
     ea = event_accumulator.EventAccumulator(run_dir)
     ea.Reload()
@@ -45,54 +50,78 @@ for run_dir in run_dirs:
 print(all_data.keys())  # dict_keys(['run1', 'run2', 'run3', ...])
 
 
-
-plt.figure(figsize=(12, 6))
-
-def get_interp(values, steps, rew, np_values):
-    common_steps_pre = np.linspace(0, 4800, np_values.shape[0])
-    if rew is None:
-        rew = np_values
-    else:
-        try:
-            rew = np.hstack([rew, np_values])
-        except:
-            common_steps_pre = np.linspace(0, 4800, rew.shape[0])
-            interpolated_values = np.interp(common_steps_pre, steps, values).reshape(-1, 1)
-            print("size mismatch")
-            rew = np.hstack([rew, interpolated_values])
+def get_interp(values, max_step, steps, rew):
+    # 데이터마다 길이가 다를 수 있으므로, 공통된 스텝을 만들어서 플로팅하기 위함.
+    common_steps_pre = np.linspace(0, max_step, rew.shape[0])
+    interpolated_values = np.interp(common_steps_pre, steps, values).reshape(-1, 1)
+    rew = np.hstack([rew, interpolated_values])
 
     return rew, common_steps_pre
 
-for run_name, run_data in all_data.items():
-    parts = run_name.split('_')
-    part_hour = parts[1].split('-')[0]
-    part_hour_int = int(part_hour)
-    steps = run_data["Reward / Total reward (mean)"]['steps']
-    values = run_data["Reward / Total reward (mean)"]['values']
-    np_values = np.array(values).reshape(-1, 1)
+rew = None
 
-    if part_hour_int < 12:
-        rew_1, common_steps_1 = get_interp(values, steps, rew_1, np_values)
-        plt.plot(steps, values, alpha=0.1, color='red')
+if args_cli.plot_mode == "mean":
 
-    elif 12 < part_hour_int < 16:
-        rew_2, common_steps_2 = get_interp(values, steps, rew_2, np_values)
-        plt.plot(steps, values, alpha=0.1 , color="blue")
-    else:
-        rew_3, common_steps_3 = get_interp(values, steps, rew_3, np_values)
-        plt.plot(steps, values, alpha=0.1, color="green")
+    for run_name, run_data in all_data.items():
+        parts = run_name.split('_')
+        part_hour = parts[1].split('-')[0]
+        part_hour_int = int(part_hour)
+        steps = run_data["Reward / Total reward (max)"]['steps']
+        values = run_data["Reward / Total reward (max)"]['values']
+        np_values = np.array(values).reshape(-1, 1)
 
-mean_1 = np.mean(rew_1, axis=1)
-mean_2 = np.mean(rew_2, axis=1)
-mean_3 = np.mean(rew_3, axis=1)
+        if rew is None:
+            rew = np_values
+        else:
+            try:
+                rew = np.hstack([rew, np_values])
+            except:
+                print("size mismatch")
+                rew = get_interp(values, args_cli.max_step, steps, rew)
 
-plt.plot(common_steps_1, mean_1, label='rollout=24', color='red')
-plt.plot(common_steps_2, mean_2, label='rollout=36', color='blue')
-plt.plot(common_steps_3, mean_3, label='rollout=48', color='green')
-plt.title('Reward')
-plt.xlabel('Steps')
-plt.ylabel('Reward')
-plt.legend()
-plt.grid()
-plt.show()
+        plt.plot(steps, values, alpha=0.1, color="blue")
+
+    mean_val = np.mean(rew, axis=1)
+
+    plt.plot(steps, mean_val, color='red')
+    plt.title('Reward History')
+    plt.xlabel('Steps')
+    plt.ylabel('Reward')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+elif args_cli.plot_mode == "merge":
+    total_steps = None
+
+    for run_name, run_data in all_data.items():
+        parts = run_name.split('_')
+        part_hour = parts[1].split('-')[0]
+        part_hour_int = int(part_hour)
+        steps = run_data["Reward / Total reward (max)"]['steps']
+        values = run_data["Reward / Total reward (max)"]['values']
+        np_values = np.array(values).reshape(-1, 1)
+
+        if rew is None:
+            rew = np_values
+            total_steps = steps
+        else:
+            try:
+                rew = np.vstack([rew, np_values])
+            except:
+                print("size mismatch")
+                rew, steps = get_interp(values, args_cli.max_step, steps, rew)
+
+            steps += total_steps[-1]
+            total_steps = np.vstack([total_steps, steps])
+
+
+    plt.plot(total_steps, rew, color='red')
+    plt.title('Reward History')
+    plt.xlabel('Steps')
+    plt.ylabel('Reward')
+    plt.legend()
+    plt.grid()
+    plt.show()
+
 
