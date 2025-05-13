@@ -8,7 +8,7 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
-from isaaclab.assets import RigidObject
+from isaaclab.assets import RigidObject, Articulation
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.sensors import FrameTransformer
 from isaaclab.utils.math import combine_frame_transforms, quat_error_magnitude, quat_mul
@@ -23,6 +23,36 @@ def object_is_lifted(
     """Reward the agent for lifting the object above the minimal height."""
     object: RigidObject = env.scene[object_cfg.name]
     return torch.where(object.data.root_pos_w[:, 2] > minimal_height, 1.0, 0.0)
+
+def object_is_stacked(
+    env: ManagerBasedRLEnv,
+    robot_cfg: SceneEntityCfg,
+    upper_object_cfg: SceneEntityCfg,
+    lower_object_cfg: SceneEntityCfg,
+    xy_threshold: float = 0.05,
+    height_threshold: float = 0.005,
+    height_diff: float = 0.0468,
+    gripper_open_val: torch.tensor = torch.tensor([0.04]),
+) -> torch.Tensor:
+    
+    robot: Articulation = env.scene[robot_cfg.name]
+    upper_object: RigidObject = env.scene[upper_object_cfg.name]
+    lower_object: RigidObject = env.scene[lower_object_cfg.name]
+    
+    pos_diff = upper_object.data.root_pos_w - lower_object.data.root_pos_w
+    height_dist = torch.linalg.vector_norm(pos_diff[:, 2:], dim=1)
+    xy_dist = torch.linalg.vector_norm(pos_diff[:, :2], dim=1)
+
+    stacked = torch.logical_and(xy_dist < xy_threshold, (height_dist - height_diff) < height_threshold)
+
+    stacked = torch.logical_and(
+        torch.isclose(robot.data.joint_pos[:, -1], gripper_open_val.to(env.device), atol=1e-4, rtol=1e-4), stacked
+    )
+    stacked = torch.logical_and(
+        torch.isclose(robot.data.joint_pos[:, -2], gripper_open_val.to(env.device), atol=1e-4, rtol=1e-4), stacked
+    )
+
+    return stacked
 
 
 def object_ee_distance(
