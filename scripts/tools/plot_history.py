@@ -8,11 +8,11 @@ import glob
 
 parser = argparse.ArgumentParser(description="Visualization Reward History")
 parser.add_argument("--library", type=str, default="skrl", help="Library for Reinforcement Learning")
-parser.add_argument("--task", type=str, default="franka_lift", help="Name of the task.")
-parser.add_argument("start_env", type=int, default=0, help="Start environment index for plotting")
-parser.add_argument("num_envs", type=int, default=2, help="Number of environments for plotting")
-parser.add_argument("max_step", type=int, default=4800, help="Max steps for plotting")
-parser.add_argument("plot_mode", type=str, default="mean", help="Plot mode: mean or merge")
+parser.add_argument("--task", type=str, default="stack_franka", help="Name of the task.")
+parser.add_argument("--start_env", type=int, default=0, help="Start environment index for plotting")
+parser.add_argument("--num_envs", type=int, default=1, help="Number of environments for plotting")
+parser.add_argument("--max_step", type=int, default=36000, help="Max steps for plotting")
+parser.add_argument("--plot_mode", type=str, default="mean", help="Plot mode: mean or merge")
 
 args_cli, hydra_args = parser.parse_known_args()
 
@@ -21,7 +21,7 @@ run_dirs = [d for d in glob.glob(os.path.join(logdir, '*')) if os.path.isdir(d)]
 
 all_data = {}
 
-for i in range(args_cli.start_env, args_cli.num_envs+1):
+for i in range(args_cli.start_env, args_cli.num_envs):
     run_dir = run_dirs[i]
     run_name = os.path.basename(run_dir)  # 예) run1, run2 등 폴더명
     ea = event_accumulator.EventAccumulator(run_dir)
@@ -100,11 +100,12 @@ elif args_cli.plot_mode == "merge":
         part_hour_int = int(part_hour)
         steps = run_data["Reward / Total reward (max)"]['steps']
         values = run_data["Reward / Total reward (max)"]['values']
+        np_steps = np.array(steps).reshape(-1, 1)
         np_values = np.array(values).reshape(-1, 1)
 
         if rew is None:
             rew = np_values
-            total_steps = steps
+            total_steps = np_steps
         else:
             try:
                 rew = np.vstack([rew, np_values])
@@ -112,8 +113,8 @@ elif args_cli.plot_mode == "merge":
                 print("size mismatch")
                 rew, steps = get_interp(values, args_cli.max_step, steps, rew)
 
-            steps += total_steps[-1]
-            total_steps = np.vstack([total_steps, steps])
+            np_steps += total_steps[-1]
+            total_steps = np.vstack([total_steps, np_steps])
 
 
     plt.plot(total_steps, rew, color='red')
