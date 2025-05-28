@@ -86,6 +86,8 @@ class RobotSceneCfg(InteractiveSceneCfg):
         ))
     
 
+
+
 def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
     frame_marker_cfg = FRAME_MARKER_CFG.copy()
     frame_marker_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
