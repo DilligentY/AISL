@@ -206,7 +206,7 @@ class RewardCfg:
                                         "std": 0.3,
                                         "stack_enum": 1,
                                         "minimum_height": 0.04}, weight=20.0)
-                                        "minimal_height": 0.04}, weight=15.0)
+                                        
     
     cube_2_stacked = RewTerm(func=mdp.object_is_stacked,
                              params={"robot_cfg": SceneEntityCfg("robot"),
