@@ -80,9 +80,9 @@ def object_goal_distance(
     std: float,
     minimal_height: float,
     stack_enum: int, 
-    command_name: str,
     robot_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
     object_cfg: SceneEntityCfg = SceneEntityCfg("cube_1"),
+    goal_object_cfg: SceneEntityCfg = SceneEntityCfg("cube_1"),
     height_threshold: float = 0.005,
     height_diff: float = 0.0468,
 ) -> torch.Tensor:
@@ -90,11 +90,11 @@ def object_goal_distance(
     # extract the used quantities (to enable type-hinting)
     robot: RigidObject = env.scene[robot_cfg.name]
     object: RigidObject = env.scene[object_cfg.name]
-    command = env.command_manager.get_command(command_name)
+    goal_object : RigidObject = env.scene[goal_object_cfg.name]
+    command = goal_object.data.root_state_w[:, :3]
     command[:, 2] += stack_enum * (height_threshold + height_diff)
     # compute the desired position in the world frame
-    des_pos_b = command[:, :3]
-    des_pos_w, _ = combine_frame_transforms(robot.data.root_state_w[:, :3], robot.data.root_state_w[:, 3:7], des_pos_b)
+    des_pos_w = command
     # distance of the end-effector to the object: (num_envs,)
     distance = torch.norm(des_pos_w - object.data.root_pos_w[:, :3], dim=1)
     # rewarded if the object is lifted above the threshold

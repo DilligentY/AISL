@@ -68,18 +68,18 @@ class ObjectTableSceneCfg(InteractiveSceneCfg):
 # MDP settings
 ##
 
-@configclass
-class CommandsCfg:
+# @configclass
+# class CommandsCfg:
 
-    stack_cube_pose= mdp.UniformCubePoseCommandCfg(
-        asset_name="cube_1",
-        body_name=MISSING,  # will be set by agent env cfg
-        resampling_time_range=(30.0, 30.0),
-        debug_vis=True,
-        ranges=mdp.UniformCubePoseCommandCfg.Ranges(
-            pos_x=(0.4, 0.6), pos_y=(-0.25, 0.25), pos_z=(0.0, 0.0), roll=(0.0, 0.0), pitch=(0.0, 0.0), yaw=(0.0, 0.0)
-        ),
-    )
+#     stack_cube_pose= mdp.UniformCubePoseCommandCfg(
+#         asset_name="cube_1",
+#         body_name="Cube",  # will be set by agent env cfg
+#         resampling_time_range=(30.0, 30.0),
+#         debug_vis=True,
+#         ranges=mdp.UniformCubePoseCommandCfg.Ranges(
+#             pos_x=(0.4, 0.6), pos_y=(-0.25, 0.25), pos_z=(0.0, 0.0), roll=(0.0, 0.0), pitch=(0.0, 0.0), yaw=(-1.0, 1.0)
+#         ),
+#     )
 
 
 @configclass
@@ -105,14 +105,13 @@ class ObservationsCfg:
         object = ObsTerm(func=mdp.object_obs)
         cube_positions = ObsTerm(func=mdp.cube_positions_in_world_frame)
         cube_orientations = ObsTerm(func=mdp.cube_orientations_in_world_frame)
-        cube_command = ObsTerm(func=mdp.object_command, params={"command_name" : "stack_cube_pose"})
         eef_pos = ObsTerm(func=mdp.ee_frame_pos)
         eef_quat = ObsTerm(func=mdp.ee_frame_quat)
         gripper_pos = ObsTerm(func=mdp.gripper_pos)
 
         def __post_init__(self):
             self.enable_corruption = False
-            self.concatenate_terms = False
+            self.concatenate_terms = True
 
     @configclass
     class RGBCameraPolicyCfg(ObsGroup):
@@ -162,14 +161,12 @@ class ObservationsCfg:
 
         def __post_init__(self):
             self.enable_corruption = False
-            self.concatenate_terms = False
+            self.concatenate_terms = True
 
     # observation groups
     policy: PolicyCfg = PolicyCfg()
-    rgb_camera: RGBCameraPolicyCfg = RGBCameraPolicyCfg()
+    # rgb_camera: RGBCameraPolicyCfg = RGBCameraPolicyCfg()
     subtask_terms: SubtaskCfg = SubtaskCfg()
-
-
 
 
 
@@ -193,6 +190,8 @@ class TerminationsCfg:
 
     success = DoneTerm(func=mdp.cubes_stacked)
 
+
+@configclass
 class RewardCfg:
     
     cube_2_reach = RewTerm(func=mdp.object_ee_distance,
@@ -200,18 +199,19 @@ class RewardCfg:
 
     cube_2_lift = RewTerm(func=mdp.object_is_lifted,
                           params={"object_cfg": SceneEntityCfg("cube_2"),
-                                  "minimal_height": 0.04}, weight=15.0)
+                                  "minimal_height": 0.04}, weight=10.0)
     
     cube_2_goal_reach = RewTerm(func=mdp.object_goal_distance,
                                 params={"object_cfg": SceneEntityCfg("cube_2"), 
                                         "std": 0.3,
                                         "stack_enum": 1,
                                         "minimum_height": 0.04}, weight=20.0)
+                                        "minimal_height": 0.04}, weight=15.0)
     
     cube_2_stacked = RewTerm(func=mdp.object_is_stacked,
-                             params={"object_cfg": SceneEntityCfg("robot"),
+                             params={"robot_cfg": SceneEntityCfg("robot"),
                                      "upper_object_cfg": SceneEntityCfg("cube_2"),
-                                     "lower_object_cfg": SceneEntityCfg("cube_1")}, weight=15.0)
+                                     "lower_object_cfg": SceneEntityCfg("cube_1")}, weight=20.0)
     
 
     cube_3_reach = RewTerm(func=mdp.object_ee_distance,
@@ -219,22 +219,19 @@ class RewardCfg:
 
     cube_3_lift = RewTerm(func=mdp.object_is_lifted,
                           params={"object_cfg": SceneEntityCfg("cube_3"),
-                                  "minimal_height": 0.04}, weight=15.0)
+                                  "minimal_height": 0.04}, weight=10.0)
     
     cube_3_goal_reach = RewTerm(func=mdp.object_goal_distance,
                                 params={"object_cfg": SceneEntityCfg("cube_3"), 
-                                        "std": 0.3,
                                         "stack_enum": 2,
-                                        "minimum_height": 0.04}, weight=20.0)
+                                        "std": 0.3,
+                                        "minimal_height": 0.04}, weight=15.0)
     
     cube_3_stacked = RewTerm(func=mdp.object_is_stacked,
-                             params={"object_cfg": SceneEntityCfg("robot"),
+                             params={"robot_cfg": SceneEntityCfg("robot"),
                                      "upper_object_cfg": SceneEntityCfg("cube_3"),
-                                     "lower_object_cfg": SceneEntityCfg("cube_2")}, weight=15.0)
+                                     "lower_object_cfg": SceneEntityCfg("cube_2")}, weight=20.0)
     
-
-
-
 
 
 
@@ -249,17 +246,16 @@ class MyStackEnvCfg(ManagerBasedRLEnvCfg):
     actions: ActionsCfg = ActionsCfg()
     # MDP settings
     terminations: TerminationsCfg = TerminationsCfg()
+    rewards: RewardCfg = RewardCfg()
+
 
     # Unused managers
-    commands = None
-    rewards = None
-    events = None
     curriculum = None
 
     def __post_init__(self):
         """Post initialization."""
         # general settings
-        self.decimation = 5
+        self.decimation = 2
         self.episode_length_s = 30.0
         # simulation settings
         self.sim.dt = 0.01  # 100Hz
