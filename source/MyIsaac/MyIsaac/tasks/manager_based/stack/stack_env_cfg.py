@@ -200,10 +200,11 @@ class RewardCfg:
                                   "minimal_height": 0.04}, weight=10.0)
     
     cube_2_goal_reach = RewTerm(func=mdp.object_goal_distance,
-                                params={"object_cfg": SceneEntityCfg("cube_2"),
-                                        "stack_enum": 1, 
+                                params={"object_cfg": SceneEntityCfg("cube_2"), 
                                         "std": 0.3,
-                                        "minimal_height": 0.04}, weight=15.0)
+                                        "stack_enum": 1,
+                                        "minimum_height": 0.04}, weight=20.0)
+                                        
     
     cube_2_stacked = RewTerm(func=mdp.object_is_stacked,
                              params={"robot_cfg": SceneEntityCfg("robot"),
