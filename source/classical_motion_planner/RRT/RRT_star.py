@@ -32,7 +32,7 @@ class RRTStar(RRT):
     References:
         [1] Sampling-based algorithms for optimal motion planning
     """
-    def __init__(self, start: tuple, goal: tuple, env: Map3D, max_dist: float = 0.3,
+    def __init__(self, start: tuple, goal: tuple, env: Map3D, max_dist: float = 0.5,
                  sample_num: int = 5000, r: float = 10.0, goal_sample_rate: float = 0.05) -> None:
         super().__init__(start, goal, env, max_dist, sample_num, goal_sample_rate)
         # optimization radius

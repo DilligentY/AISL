@@ -90,15 +90,17 @@ class SampleSearcher(Planner):
         x0, y0, z0 = node1.current
         x1, y1, z1 = node2.current
         dx, dy, dz = x1-x0, y1-y0, z1-z0
+
+        t_enter, t_exit = 0.0, 1.0
         
         for p0, dp, pmin, pmax in ( (x0, dx, xmin, xmax),
                                     (y0, dy, ymin, ymax),
                                     (z0, dz, zmin, zmax),):
             # 평행
             if abs(dp) < 1e-12:               # 선분이 축과 평행
-                if p0 < pmin or p0 > pmax:    # 평행+박스 밖 → 교차 X
+                if p0 < pmin or p0 > pmax:    # 평행 + 박스 밖 → 교차 X
                     return False
-                continue                      # 평행+박스 안 → 다음 축 검사
+                continue                      # 평행 + 박스 안 → 다음 축 검사
 
             # 축과 만나는 두 파라미터 t
             t1 = (pmin - p0) / dp

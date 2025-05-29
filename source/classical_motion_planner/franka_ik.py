@@ -32,8 +32,10 @@ app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 
 import torch
+
 import isaacsim.core.utils.prims as prim_utils
 import isaaclab.sim as sim_utils
+
 from isaaclab.assets import Articulation, RigidObject, RigidObjectCfg
 from isaaclab.sim import SimulationContext
 from isaaclab.managers import SceneEntityCfg
@@ -47,6 +49,11 @@ from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.controllers import DifferentialIKController, DifferentialIKControllerCfg
 from isaaclab.utils import configclass
 from isaaclab.utils.math import subtract_frame_transforms
+
+from RRT.RRT_wrapper import RRTWrapper
+from utils import Env
+
+
 
 @configclass
 class RobotSceneCfg(InteractiveSceneCfg):
@@ -89,17 +96,25 @@ class RobotSceneCfg(InteractiveSceneCfg):
 
 
 def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
+    # Setup the scene
     frame_marker_cfg = FRAME_MARKER_CFG.copy()
     frame_marker_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
     ee_marker = VisualizationMarkers(frame_marker_cfg.replace(prim_path="/Visuals/ee_current"))
     goal_marker = VisualizationMarkers(frame_marker_cfg.replace(prim_path="/Visuals/ee_goal"))
+    diff_ik_cfg = DifferentialIKControllerCfg(command_type="pose", use_relative_mode=False, ik_method="dls")
+    diff_ik_controller = DifferentialIKController(diff_ik_cfg, num_envs=scene.num_envs, device=scene.device)
+    robot_entity_cfg = SceneEntityCfg("robot", joint_names=["panda_joint.*"], body_names=["panda_hand"])
+    robot_entity_cfg.resolve(scene)
     robot = scene["robot"]
 
     # Reference Frame : Robot Base Frame
+    ee_start = robot.data.body_state_w[:, robot_entity_cfg.body_ids[0], :7]
     ee_goals = [0.5, 0.5, 0.7, 0.707, 0, 0.707, 0]
     ee_goals = torch.tensor(ee_goals, device=scene.device)
-    diff_ik_cfg = DifferentialIKControllerCfg(command_type="pose", use_relative_mode=False, ik_method="dls")
-    diff_ik_controller = DifferentialIKController(diff_ik_cfg, num_envs=scene.num_envs, device=scene.device)
+    
+    # Motion Planning : RRT
+    motion_planner = RRTWrapper(start=ee_start, goal=ee_goals)
+    optimal_trajectory = motion_planner.plan()
     
     ik_commands = torch.zeros(scene.num_envs, diff_ik_controller.action_dim, device=scene.device)
     ik_commands[:] = ee_goals

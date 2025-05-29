@@ -36,7 +36,7 @@ class RRT(SampleSearcher):
     References:
         [1] Rapidly-Exploring Random Trees: A New Tool for Path Planning
     """
-    def __init__(self, start: tuple, goal: tuple, env: Map3D, max_dist: float = 0.3,
+    def __init__(self, start: tuple, goal: tuple, env: Map3D, max_dist: float = 0.5,
         sample_num: int = 10000, goal_sample_rate: float = 0.05) -> None:
         super().__init__(start, goal, env)
         # Maximum expansion distance one step
@@ -45,7 +45,7 @@ class RRT(SampleSearcher):
         self.sample_num = sample_num
         # heuristic sample
         self.goal_sample_rate = goal_sample_rate
-        # plot
+        # plot handler
         self.plot = Plot3D(start=start, goal=goal, env=env)
 
     def __str__(self) -> str:

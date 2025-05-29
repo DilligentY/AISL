@@ -74,7 +74,7 @@ class Plot3D:
         if isinstance(self.env, Map3D):
             # boundary & rectangular obstacles are both cuboids → same helper
             for cuboid in itertools.chain(self.env.boundary, self.env.obs_rect):
-                self._draw_cuboid(*cuboid, color="k", alpha=0.15)
+                self._draw_cuboid(*cuboid, color="k", alpha=0.7)
 
             # circular obstacles are treated as vertical cylinders -> approximate by 16‑gon walls
             for (ox, oy, oz, r, h) in self.env.obs_circ:
