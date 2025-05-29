@@ -36,8 +36,8 @@ class RRT(SampleSearcher):
     References:
         [1] Rapidly-Exploring Random Trees: A New Tool for Path Planning
     """
-    def __init__(self, start: tuple, goal: tuple, env: Map3D, max_dist: float = 0.5,
-        sample_num: int = 10000, goal_sample_rate: float = 0.05) -> None:
+    def __init__(self, start: tuple, goal: tuple, env: Map3D, max_dist: float = 0.001,
+        sample_num: int = 10000, goal_sample_rate: float = 0.01) -> None:
         super().__init__(start, goal, env)
         # Maximum expansion distance one step
         self.max_dist = max_dist
@@ -104,9 +104,9 @@ class RRT(SampleSearcher):
             node (Node): a random node based on sampling
         """
         if np.random.random() > self.goal_sample_rate:
-            current = (np.random.uniform(self.delta, self.env.x_range - self.delta),
-                    np.random.uniform(self.delta, self.env.y_range - self.delta),
-                    np.random.uniform(self.delta, self.env.z_range - self.delta),)
+            current = (np.random.uniform(self.env.x_min + self.delta, self.env.x_max - self.delta),
+                    np.random.uniform(self.env.y_min + self.delta, self.env.y_max - self.delta),
+                    np.random.uniform(self.env.z_min + self.delta, self.env.z_max - self.delta),)
             return Node(current, None, 0, 0)
         return self.goal
 
@@ -135,7 +135,7 @@ class RRT(SampleSearcher):
             node_near.z + uz * step
         )
         
-        node_new = Node(new_pose, node_near, node_near.g + step, 0)
+        node_new = Node(new_pose, node_near.current, node_near.g + step, 0)
         # obstacle check
         if self.isCollision(node_new, node_near):
             return None

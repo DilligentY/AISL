@@ -9,13 +9,13 @@ class RRTWrapper:
     Wrapper for RRT* motion planning.
 
     """
-    def __init__(self, start: torch.Tensor, goal: torch.Tensor, env: Env.Map3D):
+    def __init__(self, start: torch.Tensor, goal: torch.Tensor, env: Env.Map3D, max_dist: float = 0.1):
         self.env = env
         self.start = start
         self.goal = goal
         self.start_tuple = tuple(self.start[:3].tolist())
         self.goal_tuple = tuple(self.goal[:3].tolist())             
-        self.planner = RRTStar(start=self.start_tuple, goal=self.goal_tuple, env=env)
+        self.planner = RRTStar(start=self.start_tuple, goal=self.goal_tuple, env=env, max_dist=max_dist)
     
     def plan(self) -> torch.Tensor:
         """
@@ -30,4 +30,7 @@ class RRTWrapper:
         """
         _, path, _ = self.planner.plan()
 
-        return torch.as_tensor(path, dtype=self.start.dtype, device=self.start.device)
+        return torch.flip(torch.as_tensor(path, dtype=self.start.dtype, device=self.start.device), dims=(0,))
+
+    def run(self):
+        self.planner.run()
