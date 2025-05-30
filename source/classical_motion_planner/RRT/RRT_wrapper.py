@@ -9,7 +9,7 @@ class RRTWrapper:
     Wrapper for RRT* motion planning.
 
     """
-    def __init__(self, start: torch.Tensor, goal: torch.Tensor, env: Env.Map3D, max_dist: float = 0.05):
+    def __init__(self, start: torch.Tensor, goal: torch.Tensor, env: Env.Map3D, max_dist: float = 0.1):
         self.env = env
         self.start = start
         self.goal = goal

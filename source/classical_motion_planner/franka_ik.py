@@ -101,6 +101,7 @@ def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
     frame_marker_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
     ee_marker = VisualizationMarkers(frame_marker_cfg.replace(prim_path="/Visuals/ee_current"))
     goal_marker = VisualizationMarkers(frame_marker_cfg.replace(prim_path="/Visuals/ee_goal"))
+    traj_marker = VisualizationMarkers(frame_marker_cfg.replace(prim_path="Visuals/ee_traj"))
     diff_ik_cfg = DifferentialIKControllerCfg(command_type="pose", use_relative_mode=False, ik_method="dls")
     diff_ik_controller = DifferentialIKController(diff_ik_cfg, num_envs=scene.num_envs, device=scene.device)
     robot_entity_cfg = SceneEntityCfg("robot", joint_names=["panda_joint.*"], body_names=["panda_hand"])
@@ -175,7 +176,8 @@ def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
 
         ee_pose_w = robot.data.body_state_w[:, robot_entity_cfg.body_ids[0], :7]
         ee_marker.visualize(ee_pose_w[:, :3], ee_pose_w[:, 3:7])
-        goal_marker.visualize(optimal_trajectory[:, :3] + scene.env_origins + robot.data.default_root_state[:, :3], ik_commands[:, 3:7].repeat(optimal_trajectory.shape[0], 1))
+        traj_marker.visualize(optimal_trajectory[:, :3] + scene.env_origins + robot.data.default_root_state[:, :3])
+        goal_marker.visualize(ee_goals[:3] + scene.env_origins + robot.data.default_root_state[:, :3], ee_goals[3:7].unsqueeze_(0))
 
 
 def main():
