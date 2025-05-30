@@ -28,12 +28,13 @@ class Env(ABC):
         self.z_range = z_range
         self.eps = eps
 
-        self.x_min = -x_range /2
-        self.x_max = x_range /2
-        self.y_min = -y_range /2
-        self.y_max = y_range /2
-        self.z_min = -z_range /2
-        self.z_max = z_range /2
+        self.x_min = -x_range
+        self.y_min = -y_range
+        self.z_min = -z_range
+        
+        self.x_max = x_range
+        self.y_max = y_range
+        self.z_max = z_range
 
 
 class Map(Env):
@@ -97,12 +98,12 @@ class Map3D(Env):
 
         # boundary of environment : [x, y, z, width, depth, height]
         self.boundary = [
-            [-x/2-1, -y/2, -z/2, 1, y, z],
-            [x/2, -y/2, -z/2, 1, y, z],
-            [-x/2, -y/2-1, -z/2, x, 1, z],
-            [-x/2, y/2, -z/2, x, 1, z],
-            [-x/2, -y/2, -z/2-1, x, y, 1],
-            [-x/2, -y/2, z/2, x, y, 1],]
+            [-x-1, -y,  -z,    1, 2*y, 2*z],
+            [ x,   -y,  -z,    1, 2*y, 2*z],
+            [-x,   -y-1,-z,    2*x, 1, 2*z],
+            [-x,    y,  -z,    2*x, 1, 2*z],
+            [-x,   -y,  -z-1,  2*x, 2*y, 1],
+            [-x,   -y,   z,    2*x, 2*y, 1],]
         self.obs_rect = []
         self.obs_circ = []
 

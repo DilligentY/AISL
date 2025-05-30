@@ -129,7 +129,7 @@ def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
     ee_start_pos_b, ee_start_rot_b = subtract_frame_transforms(
         root_start_w[:, :3], root_start_w[:, 3:7], ee_start[:, :3], ee_start[:, 3:7])
     ee_start_b = torch.cat((ee_start_pos_b, ee_start_rot_b), dim=-1).squeeze_(0)
-    ee_goals = [0.1, 0.3, 0.3, 0.707, 0, 0.707, 0]
+    ee_goals = [0.3, 0.3, 0.3, 0.707, 0, 0.707, 0]
     ee_goals = torch.tensor(ee_goals, device=scene.device)
     
     # Motion Planning : RRT
