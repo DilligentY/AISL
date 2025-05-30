@@ -134,7 +134,7 @@ def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
     ee_goals = torch.tensor(ee_goals, device=scene.device)
     
     # Motion Planning : RRT
-    motion_planner = RRTWrapper(start=ee_start_b, goal=ee_goals, env=Env.Map3D(5, 5, 5), max_dist=0.005)
+    motion_planner = RRTWrapper(start=ee_start_b, goal=ee_goals, env=Env.Map3D(5, 5, 5), max_dist=0.05)
     optimal_trajectory = motion_planner.plan()
     
     ik_commands = torch.zeros(scene.num_envs, diff_ik_controller.action_dim, device=scene.device)
