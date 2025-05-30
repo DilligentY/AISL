@@ -20,8 +20,8 @@ environment = Env.Map3D(5, 5, 5)
 # environment.update(obs_rect=obs_rect)
 
 planner_torch = RRTWrapper(
-    start=torch.tensor([0.38, 0, 0.45], dtype=torch.float32),
-    goal=torch.tensor([0.3, 0.3, 0.5], dtype=torch.float32),
+    start=torch.tensor([0.38, 0, 0.45, 0.707, 0, 0.707, 0], dtype=torch.float32),
+    goal=torch.tensor([0.3, 0.3, 0.5, 0, 0.707, 0, 0.707], dtype=torch.float32),
     env=environment
 )
 
@@ -33,9 +33,7 @@ ee_goals = torch.tensor(ee_goals)
 # planner = RRTStar(start = (18,8,2), goal=(35,22,10), env=environment)
 
 try:
-    # path = planner_torch.plan()
-    # ik_commands[:, :3] = path[0, :3]
-    # ik_commands[:, 3:] = ee_goals[3:]
-    planner_torch.run()
+    path = planner_torch.plan()
+    # planner_torch.run()
 finally:
     print("End of RRT*")
