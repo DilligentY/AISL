@@ -20,7 +20,7 @@ environment = Env.Map3D(5, 5, 5)
 # environment.update(obs_rect=obs_rect)
 
 planner_torch = RRTWrapper(
-    start=torch.tensor([0.38, 0, 0.45, 0.707, 0, 0.707, 0], dtype=torch.float32),
+    start=torch.tensor([0.1, 0, 0.1, 0.707, 0, 0.707, 0], dtype=torch.float32),
     goal=torch.tensor([0.3, 0.3, 0.5, 0, 0.707, 0, 0.707], dtype=torch.float32),
     env=environment
 )

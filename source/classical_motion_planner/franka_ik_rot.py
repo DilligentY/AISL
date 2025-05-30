@@ -98,7 +98,7 @@ class RobotSceneCfg(InteractiveSceneCfg):
 def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
     # Setup the scene
     point_marker_cfg = CUBOID_MARKER_CFG.copy()
-    point_marker_cfg.markers["cuboid"].size = (0.03, 0.03, 0.03)
+    point_marker_cfg.markers["cuboid"].size = (0.01, 0.01, 0.01)
     frame_marker_cfg = FRAME_MARKER_CFG.copy()
     frame_marker_cfg.markers["frame"].scale = (0.1, 0.1, 0.1)
     ee_marker = VisualizationMarkers(frame_marker_cfg.replace(prim_path="/Visuals/ee_current"))
@@ -141,7 +141,7 @@ def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
     
     ik_commands = torch.zeros(scene.num_envs, diff_ik_controller.action_dim, device=scene.device)
     ik_commands[:, :3] = optimal_trajectory[0, :3]
-    # ik_commands[:, 3:] = ee_goals[3:]
+    ik_commands[:, 3:] = optimal_trajectory[0, 3:7]
 
     diff_ik_controller.reset()
     diff_ik_controller.set_command(ik_commands, ee_start[:, :3], ee_start[:, 3:7])
@@ -157,9 +157,9 @@ def run_simulator(sim : sim_utils.SimulationContext, scene : InteractiveScene):
 
         # Compute the position error in the base frame
         ee_pos_err_b = ee_pos_b[:, :3] - ik_commands[:, :3]
-        if torch.norm(ee_pos_err_b) < 5e-2:
+        if torch.norm(ee_pos_err_b) < 1e-2:
             i = (i+1) % optimal_trajectory.shape[0]
-            ik_commands[:, :3] = optimal_trajectory[i, :3]
+            ik_commands[:, :] = optimal_trajectory[i, :]
             diff_ik_controller.set_command(ik_commands, ee_pose_w[:, :3], ee_pose_w[:, 3:7])
 
         # Compute Jacobian
